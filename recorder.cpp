@@ -5,7 +5,7 @@
 #include <jack/jack.h>
 
 struct Input {
-    Input(jack_port_t *input) : volume(0), arm(true), mute(false), input(input) {}
+    Input(jack_port_t *input) : volume(1), arm(true), mute(false), input(input) {}
     jack_port_t *input;
     float volume;
     bool arm;
@@ -27,24 +27,24 @@ int process(jack_nframes_t nframes, void *arg) {
     size_t n_samples = (sizeof(jack_default_audio_sample_t) * nframes) / sizeof(float);
 
     // get outputs
-    float *main_out_sample = (float *)jack_port_get_buffer(main_out, nframes);
-    float *monitor_out_sample = (float *)jack_port_get_buffer(monitor_out, nframes);
+    float *main_out_buffer = (float *)jack_port_get_buffer(main_out, nframes);
+    float *monitor_out_buffer = (float *)jack_port_get_buffer(monitor_out, nframes);
     
     for (int i = 0; i < n_samples; i++) {
-        main_out_sample[i] = 0;
-        monitor_out_sample[i] = 0;
+        main_out_buffer[i] = 0;
+        monitor_out_buffer[i] = 0;
     }
 
     // get inputs and add them to outputs
     for (int track = 0; track < n_tracks; track++) {
         
-        if (inputs[track].volume > 0 && inputs[track].arm && !inputs[track].mute) {
+        if (inputs[track]->volume > 0 && inputs[track]->arm && !inputs[track]->mute) {
             float *in_sample = (float *)jack_port_get_buffer(inputs[track]->input, nframes);
 
             // add input buffer to output buffers
             for (int i = 0; i < n_samples; i++) {
-                main_out_sample[i] += in_sample[i] * inputs[track].volume;
-                monitor_out_sample[i] += in_sample[i] * inputs[track].volume;
+                main_out_buffer[i] += in_sample[i] * inputs[track]->volume;
+                monitor_out_buffer[i] += in_sample[i] * inputs[track]->volume;
             }
         }
     }
@@ -70,7 +70,6 @@ int main(int argc, char *argv[])
     jack_status_t status;
 
     client = jack_client_open(client_name, options, &status, server_name);
-
     if (client == NULL) {
         std::cout << "Cant connect to JACK" << std::endl;
         exit(1);
