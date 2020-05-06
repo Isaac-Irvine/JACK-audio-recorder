@@ -1,13 +1,16 @@
+#ifndef RECORDER_H
+#define RECORDER_H
+
 #include <jack/jack.h>
 #include <vector>
 #include <string>
 
 class JackController
 {
-    private:
+private:
     struct Input
     {
-        Input(jack_port_t *input) : volume(1), arm(true), mute(false), input(input) {}
+        Input(jack_port_t *input) : input(input), volume(1), arm(true), mute(false) {}
         jack_port_t *input;
         float volume;
         bool arm;
@@ -19,7 +22,7 @@ class JackController
     jack_port_t *monitor_out;
     jack_client_t *client;
 
-    public:
+public:
     JackController();
     ~JackController();
     bool start_recording(std::string file_name);
@@ -32,3 +35,5 @@ class JackController
     int process(jack_nframes_t nframes, void *arg);
 
 };
+
+#endif // RECORDER_H

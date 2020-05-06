@@ -9,6 +9,7 @@
 // a pointer to the current JackController instance. Currently only one instance of JackController can run at a time because of this
 JackController *controller;
 
+
 /**
  * Static funtion needed for jack. This is just a proxy for JackController::process.
  * There is probably a better way to do this but I dont know it.
@@ -18,6 +19,7 @@ int call_process(jack_nframes_t nframes, void *arg)
 {
     return controller->process(nframes, arg);
 }
+
 
 /**
  * Initialiser for JackController.
@@ -69,6 +71,7 @@ JackController::~JackController()
     jack_client_close(client);
 }
 
+
 /*
  * Adds a track to the recording with default properties
  */
@@ -83,6 +86,7 @@ bool JackController::add_track()
     inputs.push_back(new_input);
     return true;
 }
+
 
 /**
  * Processes the sound coming from JACK.
@@ -118,6 +122,7 @@ int JackController::process(jack_nframes_t nframes, void *arg)
 
     return 0;
 }
+
 
 
 /**
